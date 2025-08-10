@@ -1,0 +1,24 @@
+{
+  "name": "task-metrics-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 3000"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tailwindcss": "3.4.10",
+    "clsx": "2.1.1",
+    "swr": "2.2.5"
+  },
+  "devDependencies": {
+    "vite": "5.4.8",
+    "@vitejs/plugin-react": "4.3.1",
+    "autoprefixer": "10.4.20",
+    "postcss": "8.4.47"
+  }
+}
