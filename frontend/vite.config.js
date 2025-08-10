@@ -1,30 +1,24 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import dotenv from "dotenv";
 
-dotenv.config();
+// No dotenv import needed. Vite automatically loads .env files at project root
+// and exposes variables prefixed with REACT_APP_. Our frontend/.env sets
+// REACT_APP_BACKEND_URL=/api which gets read at build time.
 
-export default defineConfig(() => {
-  const target = process.env.VITE_DEV_PROXY_TARGET || "http://localhost:8001";
-  const backendUrl = process.env.REACT_APP_BACKEND_URL; // injected at build via .env or env var
-  return {
-    plugins: [react()],
-    define: {
-      "import.meta.env.REACT_APP_BACKEND_URL": JSON.stringify(backendUrl),
-    },
-    server: {
-      port: 3000,
-      host: true,
-      proxy: {
-        "/api": {
-          target,
-          changeOrigin: true,
-        },
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3000,
+    host: true, // 0.0.0.0
+    proxy: {
+      "/api": {
+        target: "http://localhost:8001",
+        changeOrigin: true,
       },
     },
-    preview: {
-      port: 3000,
-      host: true,
-    },
-  };
+  },
+  preview: {
+    port: 3000,
+    host: true,
+  },
 });
