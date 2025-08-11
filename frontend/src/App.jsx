@@ -11,11 +11,27 @@ const METRICS = [
   { value: "check", label: "Checkbox" },
 ];
 
-const fetcher = (url) => fetch(url).then((r) => r.json());
+const fetcher = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    const errorText = await response.text();
+    let errorMessage;
+    try {
+      const errorData = JSON.parse(errorText);
+      errorMessage = errorData.detail || `HTTP ${response.status}`;
+    } catch {
+      errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
+  }
+  return response.json();
+};
 
 function useTasks() {
   const { data, error, isLoading } = useSWR(`${api("/tasks")}`, fetcher, {
     revalidateOnFocus: true,
+    errorRetryCount: 3,
+    errorRetryInterval: 1000
   });
   return { tasks: data || [], error, isLoading };
 }
@@ -35,24 +51,34 @@ function TaskForm() {
   const [goal, setGoal] = useState("");
   const [color, setColor] = useState("#6366F1");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) return;
     setSubmitting(true);
+    setError(null);
     try {
-      await createTask({ name, metric, goal: goal ? Number(goal) : null, color });
+      await createTask({ name: name.trim(), metric, goal: goal ? Number(goal) : null, color });
       setName("");
       setGoal("");
       setMetric("count");
       mutate(api("/tasks"));
+    } catch (err) {
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-3 p-4 bg-white rounded-lg shadow border">
+    <div className="space-y-3">
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          Error: {error}
+        </div>
+      )}
+      <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-3 p-4 bg-white rounded-lg shadow border">
       <input
         className="input"
         placeholder="Task name"
@@ -78,12 +104,23 @@ function TaskForm() {
       <button className="btn-primary" disabled={submitting}>
         {submitting ? "Adding..." : "Add Task"}
       </button>
-    </form>
+      </form>
+    </div>
   );
 }
 
 function TaskRow({ task, onDelete }) {
-  const { data: summary, mutate: revalidate } = useSWR(api(`/tasks/${task.id}/summary`), fetcher);
+  const { data: summary, error: summaryError, mutate: revalidate } = useSWR(api(`/tasks/${task.id}/summary`), fetcher);
+  const [deleteError, setDeleteError] = useState(null);
+  
+  const handleDelete = async () => {
+    setDeleteError(null);
+    try {
+      await onDelete(task.id);
+    } catch (err) {
+      setDeleteError(err.message);
+    }
+  };
 
   return (
     <div className="grid grid-cols-[1fr,1fr] md:grid-cols-[1fr,340px] gap-3 items-center">
@@ -94,9 +131,15 @@ function TaskRow({ task, onDelete }) {
           <div className="text-xs text-gray-500">{task.metric}{task.goal ? ` • goal: ${task.goal}` : ""}</div>
           <SummaryBar task={task} summary={summary} />
         </div>
-        <button className="btn danger" onClick={() => onDelete(task.id)} title="Delete task">
+        <button className="btn danger" onClick={handleDelete} title="Delete task">
           ✕
         </button>
+        {deleteError && (
+          <div className="text-xs text-red-600 mt-1">{deleteError}</div>
+        )}
+        {summaryError && (
+          <div className="text-xs text-red-600 mt-1">Failed to load summary</div>
+        )}
       </div>
       <div className="p-3 rounded-lg border bg-white">
         <ActionCell task={task} summary={summary} onActionDone={revalidate} />
@@ -160,20 +203,28 @@ function ActionCell({ task, summary, onActionDone }) {
 
 function CountCell({ task, onActionDone }) {
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  
   const inc = async (val = 1) => {
     setBusy(true);
+    setError(null);
     try {
       await createEvent(task.id, { type: "increment", value: val });
+      onActionDone();
+    } catch (err) {
+      setError(err.message);
     } finally {
       setBusy(false);
-      onActionDone();
     }
   };
   return (
-    <div className="flex items-center gap-2">
-      <button className="btn" disabled={busy} onClick={() => inc(1)}>+1</button>
-      <button className="btn" disabled={busy} onClick={() => inc(5)}>+5</button>
-      <button className="btn" disabled={busy} onClick={() => inc(10)}>+10</button>
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <button className="btn" disabled={busy} onClick={() => inc(1)}>+1</button>
+        <button className="btn" disabled={busy} onClick={() => inc(5)}>+5</button>
+        <button className="btn" disabled={busy} onClick={() => inc(10)}>+10</button>
+      </div>
+      {error && <div className="text-xs text-red-600">{error}</div>}
     </div>
   );
 }
@@ -182,6 +233,7 @@ function TimerCell({ task, onActionDone }) {
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [startAt, setStartAt] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let t;
@@ -194,31 +246,45 @@ function TimerCell({ task, onActionDone }) {
   }, [running, startAt]);
 
   const start = async () => {
-    await createEvent(task.id, { type: "timer_start" });
-    setStartAt(Date.now());
-    setElapsed(0);
-    setRunning(true);
+    setError(null);
+    try {
+      await createEvent(task.id, { type: "timer_start" });
+      setStartAt(Date.now());
+      setElapsed(0);
+      setRunning(true);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const stop = async () => {
-    const seconds = Math.max(0, Math.floor((Date.now() - startAt) / 1000));
-    await createEvent(task.id, { type: "timer_stop", value: seconds });
-    setRunning(false);
-    setStartAt(null);
-    setElapsed(0);
-    onActionDone();
+    setError(null);
+    try {
+      const seconds = Math.max(0, Math.floor((Date.now() - startAt) / 1000));
+      await createEvent(task.id, { type: "timer_stop", value: seconds });
+      setRunning(false);
+      setStartAt(null);
+      setElapsed(0);
+      onActionDone();
+    } catch (err) {
+      setError(err.message);
+      setRunning(false);
+    }
   };
 
   return (
-    <div className="flex items-center gap-3">
-      {!running ? (
-        <button className="btn" onClick={start}>Start</button>
-      ) : (
-        <>
-          <div className="text-sm tabular-nums">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</div>
-          <button className="btn danger" onClick={stop}>Stop</button>
-        </>
-      )}
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        {!running ? (
+          <button className="btn" onClick={start}>Start</button>
+        ) : (
+          <>
+            <div className="text-sm tabular-nums">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</div>
+            <button className="btn danger" onClick={stop}>Stop</button>
+          </>
+        )}
+      </div>
+      {error && <div className="text-xs text-red-600">{error}</div>}
     </div>
   );
 }
@@ -226,36 +292,50 @@ function TimerCell({ task, onActionDone }) {
 function CheckCell({ task, summary, onActionDone }) {
   const done = !!summary?.done;
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
 
   const doCheck = async () => {
     setBusy(true);
+    setError(null);
     try {
       await createEvent(task.id, { type: "check" });
+      onActionDone();
+    } catch (err) {
+      setError(err.message);
     } finally {
       setBusy(false);
-      onActionDone();
     }
   };
 
   return (
-    <div>
+    <div className="space-y-2">
       <button className="btn" disabled={busy || done} onClick={doCheck}>{done ? "Completed" : "Mark done"}</button>
+      {error && <div className="text-xs text-red-600">{error}</div>}
     </div>
   );
 }
 
 export default function App() {
-  const { tasks, isLoading } = useTasks();
+  const { tasks, error: tasksError, isLoading } = useTasks();
 
   const onDelete = async (id) => {
-    await deleteTask(id);
-    mutate(api("/tasks"));
+    try {
+      await deleteTask(id);
+      mutate(api("/tasks"));
+    } catch (error) {
+      throw error; // Re-throw to be handled by TaskRow
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar />
       <div className="max-w-4xl mx-auto p-4 space-y-4">
+        {tasksError && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            Failed to load tasks: {tasksError.message}
+          </div>
+        )}
         <TaskForm />
         {isLoading && <div className="text-sm text-gray-500">Loading tasks…</div>}
         <div className="space-y-3">
