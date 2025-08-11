@@ -2,26 +2,86 @@ const BASE = import.meta.env.REACT_APP_BACKEND_URL;
 
 export const api = (path) => `${BASE}${path}`;
 
+// CSRF token management
+let csrfToken = null;
+
+export async function getCsrfToken() {
+  if (!csrfToken) {
+    try {
+      const response = await fetch(api("/csrf-token"), { credentials: 'include' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      csrfToken = data.csrf_token;
+    } catch (error) {
+      console.error('Failed to get CSRF token:', error);
+      throw new Error('Failed to initialize security token');
+    }
+  }
+  return csrfToken;
+}
+
+// Helper function for API calls with CSRF protection
+async function apiCall(url, options = {}) {
+  const token = await getCsrfToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-CSRF-Token': token,
+    ...options.headers
+  };
+  
+  const response = await fetch(url, {
+    ...options,
+    headers,
+    credentials: 'include'
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    let errorMessage;
+    try {
+      const errorData = JSON.parse(errorText);
+      errorMessage = errorData.detail || `HTTP ${response.status}`;
+    } catch {
+      errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
+  }
+  
+  return response.json();
+}
+
 export async function createTask(body) {
-  const r = await fetch(api("/tasks"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  if (!r.ok) throw new Error("Failed to create task");
-  return r.json();
+  return apiCall(api("/tasks"), {
+    method: "POST",
+    body: JSON.stringify(body)
+  });
 }
 
 export async function deleteTask(id) {
-  const r = await fetch(api(`/tasks/${id}`), { method: "DELETE" });
-  if (!r.ok) throw new Error("Failed to delete task");
-  return r.json();
+  return apiCall(api(`/tasks/${id}`), {
+    method: "DELETE"
+  });
 }
 
 export async function createEvent(id, body) {
-  const r = await fetch(api(`/tasks/${id}/events`), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  if (!r.ok) throw new Error("Failed to create event");
-  return r.json();
+  return apiCall(api(`/tasks/${id}/events`), {
+    method: "POST",
+    body: JSON.stringify(body)
+  });
 }
 
 export async function getSummary(id) {
-  const r = await fetch(api(`/tasks/${id}/summary`));
-  if (!r.ok) throw new Error("Failed to fetch summary");
-  return r.json();
+  const response = await fetch(api(`/tasks/${id}/summary`));
+  if (!response.ok) {
+    const errorText = await response.text();
+    let errorMessage;
+    try {
+      const errorData = JSON.parse(errorText);
+      errorMessage = errorData.detail || `HTTP ${response.status}`;
+    } catch {
+      errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
+  }
+  return response.json();
 }
