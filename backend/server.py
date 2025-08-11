@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from typing import List, Optional
 from contextlib import contextmanager
 
@@ -72,11 +72,36 @@ class MetricType(str):
     TIMER = "timer"  # start/stop timer sessions
     CHECK = "check"  # checkbox complete
 
+class TaskTemplateCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    color: str = Field("#6366F1", description="Tile color hex", pattern=r'^#[0-9A-Fa-f]{6}$')
+    metric: str = Field(MetricType.COUNT, description="count|timer|check")
+    goal: Optional[int] = Field(None, description="Goal units (sets/minutes/checks)", ge=1, le=10000)
+    active_days: List[int] = Field(..., description="Days of week (0=Monday, 6=Sunday)")
+    
+    @validator('metric')
+    def validate_metric(cls, v):
+        if v not in [MetricType.COUNT, MetricType.TIMER, MetricType.CHECK]:
+            raise ValueError('Invalid metric type')
+        return v
+    
+    @validator('active_days')
+    def validate_active_days(cls, v):
+        if not v or not all(0 <= day <= 6 for day in v):
+            raise ValueError('Active days must be 0-6 (Monday-Sunday)')
+        return sorted(list(set(v)))  # Remove duplicates and sort
+
+class TaskTemplate(TaskTemplateCreate):
+    id: str
+    created_at: datetime
+
 class TaskCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     color: str = Field("#6366F1", description="Tile color hex", pattern=r'^#[0-9A-Fa-f]{6}$')
     metric: str = Field(MetricType.COUNT, description="count|timer|check")
     goal: Optional[int] = Field(None, description="Goal units (sets/minutes/checks)", ge=1, le=10000)
+    template_id: Optional[str] = Field(None, description="Template ID if created from template")
+    scheduled_date: Optional[date] = Field(None, description="Date this task is scheduled for")
     
     @validator('metric')
     def validate_metric(cls, v):
@@ -99,14 +124,30 @@ class Event(BaseModel):
 def ensure_indexes(db):
     """Ensure database indexes exist"""
     db["tasks"].create_index("id", unique=True)
+    db["tasks"].create_index("scheduled_date")
+    db["tasks"].create_index("template_id")
+    db["templates"].create_index("id", unique=True)
     db["events"].create_index("task_id")
     db["events"].create_index("at")
 
 def validate_task_id(task_id: str) -> str:
-    """Validate and sanitize task ID"""
-    if not task_id or len(task_id) > 50:
-        raise HTTPException(status_code=400, detail="Invalid task ID")
-    return task_id
+    """Validate and sanitize task ID to prevent NoSQL injection"""
+    import re
+    
+    if not task_id:
+        raise HTTPException(status_code=400, detail="Task ID is required")
+    
+    # Check length
+    if len(task_id) > 50:
+        raise HTTPException(status_code=400, detail="Task ID too long")
+    
+    # Validate UUID format (our task IDs are UUIDs)
+    uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+    if not re.match(uuid_pattern, task_id, re.IGNORECASE):
+        raise HTTPException(status_code=400, detail="Invalid task ID format")
+    
+    # Return sanitized (lowercase) UUID
+    return task_id.lower()
 
 # API routes (must be prefixed with /api)
 @app.get("/api/health")
@@ -121,16 +162,93 @@ def get_csrf_token(request: Request, csrf_protect: CsrfProtect = Depends()):
     csrf_protect.set_csrf_cookie(csrf_token, response)
     return response
 
-@app.get("/api/tasks", response_model=List[Task])
-def list_tasks(db=Depends(get_database)):
+# Template endpoints
+@app.get("/api/templates", response_model=List[TaskTemplate])
+def list_templates(db=Depends(get_database)):
     ensure_indexes(db)
     items = []
     try:
-        for doc in db["tasks"].find({}, {"_id": 0}).limit(100):  # Add pagination limit
+        for doc in db["templates"].find({}, {"_id": 0}).limit(100):
+            items.append(TaskTemplate(**doc))
+        return items
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to retrieve templates")
+
+@app.post("/api/templates", response_model=TaskTemplate)
+def create_template(request: Request, payload: TaskTemplateCreate, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
+    csrf_protect.validate_csrf(request)
+    ensure_indexes(db)
+    tid = str(uuid.uuid4())
+    doc = {
+        "id": tid,
+        "name": payload.name.strip(),
+        "color": payload.color,
+        "metric": payload.metric,
+        "goal": payload.goal,
+        "active_days": payload.active_days,
+        "created_at": datetime.now(timezone.utc),
+    }
+    try:
+        db["templates"].insert_one(doc)
+        doc.pop("_id", None)
+        return TaskTemplate(**doc)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to create template")
+
+@app.delete("/api/templates/{template_id}")
+def delete_template(request: Request, template_id: str, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
+    csrf_protect.validate_csrf(request)
+    template_id = validate_task_id(template_id)
+    ensure_indexes(db)
+    try:
+        template = db["templates"].find_one({"id": template_id})
+        if not template:
+            raise HTTPException(status_code=404, detail="Template not found")
+        
+        db["templates"].delete_one({"id": template_id})
+        return {"ok": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to delete template")
+
+@app.get("/api/tasks", response_model=List[Task])
+def list_tasks(date_filter: Optional[str] = None, db=Depends(get_database)):
+    ensure_indexes(db)
+    items = []
+    try:
+        query = {}
+        if date_filter:
+            try:
+                filter_date = datetime.strptime(date_filter, "%Y-%m-%d").date()
+                query["scheduled_date"] = {"$eq": filter_date.isoformat()}
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+        
+        for doc in db["tasks"].find(query, {"_id": 0}).limit(100):
+            items.append(Task(**doc))
+        return items
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to retrieve tasks")
+
+@app.get("/api/tasks/daily/{date_str}", response_model=List[Task])
+def get_daily_tasks(date_str: str, db=Depends(get_database)):
+    ensure_indexes(db)
+    try:
+        filter_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    
+    items = []
+    try:
+        query = {"scheduled_date": {"$eq": filter_date.isoformat()}}
+        for doc in db["tasks"].find(query, {"_id": 0}):
             items.append(Task(**doc))
         return items
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to retrieve tasks")
+        raise HTTPException(status_code=500, detail="Failed to retrieve daily tasks")
 
 @app.post("/api/tasks", response_model=Task)
 def create_task(request: Request, payload: TaskCreate, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
@@ -143,6 +261,8 @@ def create_task(request: Request, payload: TaskCreate, db=Depends(get_database),
         "color": payload.color,
         "metric": payload.metric,
         "goal": payload.goal,
+        "template_id": payload.template_id,
+        "scheduled_date": payload.scheduled_date.isoformat() if payload.scheduled_date else None,
         "created_at": datetime.now(timezone.utc),
     }
     try:
@@ -227,9 +347,9 @@ def task_summary(task_id: str, db=Depends(get_database)):
         metric = task.get("metric")
         
         if metric == MetricType.COUNT:
-            # Use aggregation pipeline for better performance
+            # Use aggregation pipeline with validated inputs
             pipeline = [
-                {"$match": {"task_id": task_id, "type": "increment"}},
+                {"$match": {"task_id": {"$eq": task_id}, "type": {"$eq": "increment"}}},
                 {"$group": {"_id": None, "total": {"$sum": {"$ifNull": ["$value", 1]}}}}
             ]
             result = list(db["events"].aggregate(pipeline))
@@ -237,9 +357,9 @@ def task_summary(task_id: str, db=Depends(get_database)):
             return {"total": total, "goal": task.get("goal")}
             
         elif metric == MetricType.TIMER:
-            # Use aggregation pipeline for better performance
+            # Use aggregation pipeline with validated inputs
             pipeline = [
-                {"$match": {"task_id": task_id, "type": "timer_stop"}},
+                {"$match": {"task_id": {"$eq": task_id}, "type": {"$eq": "timer_stop"}}},
                 {"$group": {"_id": None, "total_sec": {"$sum": {"$ifNull": ["$value", 0]}}}}
             ]
             result = list(db["events"].aggregate(pipeline))
@@ -247,7 +367,8 @@ def task_summary(task_id: str, db=Depends(get_database)):
             return {"total_sec": total_sec, "goal": task.get("goal")}
             
         elif metric == MetricType.CHECK:
-            done = db["events"].count_documents({"task_id": task_id, "type": "check"}) > 0
+            # Use explicit equality operator to prevent injection
+            done = db["events"].count_documents({"task_id": {"$eq": task_id}, "type": {"$eq": "check"}}) > 0
             return {"done": done}
         else:
             return {"message": "Unknown metric"}
@@ -255,6 +376,92 @@ def task_summary(task_id: str, db=Depends(get_database)):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to retrieve task summary")
+
+@app.post("/api/tasks/generate-daily/{date_str}")
+def generate_daily_tasks(request: Request, date_str: str, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
+    """Generate daily tasks from templates for a specific date"""
+    csrf_protect.validate_csrf(request)
+    ensure_indexes(db)
+    
+    try:
+        target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        weekday = target_date.weekday()  # 0=Monday, 6=Sunday
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    
+    try:
+        # Check if tasks already exist for this date with explicit equality
+        existing_count = db["tasks"].count_documents({"scheduled_date": {"$eq": target_date.isoformat()}})
+        if existing_count > 0:
+            return {"message": f"Tasks already exist for {date_str}", "created": 0}
+        
+        # Find templates that should run on this weekday with explicit operator
+        templates = list(db["templates"].find({"active_days": {"$in": [weekday]}}, {"_id": 0}))
+        created_tasks = []
+        
+        for template in templates:
+            task_id = str(uuid.uuid4())
+            task_doc = {
+                "id": task_id,
+                "name": template["name"],
+                "color": template["color"],
+                "metric": template["metric"],
+                "goal": template["goal"],
+                "template_id": template["id"],
+                "scheduled_date": target_date.isoformat(),
+                "created_at": datetime.now(timezone.utc),
+            }
+            db["tasks"].insert_one(task_doc)
+            task_doc.pop("_id", None)
+            created_tasks.append(task_doc)
+        
+        return {"message": f"Generated {len(created_tasks)} tasks for {date_str}", "created": len(created_tasks), "tasks": created_tasks}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to generate daily tasks")
+
+# Daily reporting endpoint
+@app.get("/api/reports/daily/{date_str}")
+def daily_report(date_str: str, db=Depends(get_database)):
+    """Get daily progress report"""
+    ensure_indexes(db)
+    
+    try:
+        target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    
+    try:
+        # Get all tasks for the date with explicit equality operator
+        tasks = list(db["tasks"].find({"scheduled_date": {"$eq": target_date.isoformat()}}, {"_id": 0}))
+        
+        if not tasks:
+            return {"date": date_str, "total_tasks": 0, "completed_tasks": 0, "completion_rate": 0, "metrics": {}}
+        
+        total_tasks = len(tasks)
+        completed_tasks = 0
+        metrics = {"count": 0, "timer": 0, "check": 0}
+        
+        for task in tasks:
+            task_id = task["id"]
+            metric = task["metric"]
+            
+            # Check if task has any activity with explicit equality operator
+            has_activity = db["events"].count_documents({"task_id": {"$eq": task_id}}) > 0
+            if has_activity:
+                completed_tasks += 1
+                metrics[metric] += 1
+        
+        completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+        
+        return {
+            "date": date_str,
+            "total_tasks": total_tasks,
+            "completed_tasks": completed_tasks,
+            "completion_rate": round(completion_rate, 1),
+            "metrics": metrics
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to generate daily report")
 
 # Initialize database indexes on startup
 @app.on_event("startup")

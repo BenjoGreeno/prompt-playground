@@ -3,7 +3,7 @@ import useSWR, { mutate } from "swr";
 import clsx from "clsx";
 import "./index.css";
 import "./App.css";
-import { api, getSummary, createTask, deleteTask, createEvent } from "./api";
+import { api, getSummary, createTask, deleteTask, createEvent, createTemplate, deleteTemplate, getDailyTasks, generateDailyTasks, getDailyReport, formatDate } from "./api";
 
 const METRICS = [
   { value: "count", label: "Count" },
@@ -36,11 +36,30 @@ function useTasks() {
   return { tasks: data || [], error, isLoading };
 }
 
-function TopBar() {
+function TopBar({ activeTab, setActiveTab }) {
   return (
     <div className="px-4 py-4 border-b bg-white/70 backdrop-blur sticky top-0 z-10">
       <h1 className="text-2xl font-semibold">Task Metrics</h1>
-      <p className="text-sm text-gray-500">Create tasks with different metrics and update them from the action column.</p>
+      <div className="flex gap-4 mt-3">
+        <button 
+          className={clsx("px-3 py-1 rounded text-sm", activeTab === 'tasks' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-gray-800')}
+          onClick={() => setActiveTab('tasks')}
+        >
+          All Tasks
+        </button>
+        <button 
+          className={clsx("px-3 py-1 rounded text-sm", activeTab === 'daily' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-gray-800')}
+          onClick={() => setActiveTab('daily')}
+        >
+          Daily View
+        </button>
+        <button 
+          className={clsx("px-3 py-1 rounded text-sm", activeTab === 'templates' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-gray-800')}
+          onClick={() => setActiveTab('templates')}
+        >
+          Templates
+        </button>
+      </div>
     </div>
   );
 }
@@ -109,7 +128,7 @@ function TaskForm() {
   );
 }
 
-function TaskRow({ task, onDelete }) {
+function TaskRow({ task, onDelete, onActionDone }) {
   const { data: summary, error: summaryError, mutate: revalidate } = useSWR(api(`/tasks/${task.id}/summary`), fetcher);
   const [deleteError, setDeleteError] = useState(null);
   
@@ -120,6 +139,11 @@ function TaskRow({ task, onDelete }) {
     } catch (err) {
       setDeleteError(err.message);
     }
+  };
+  
+  const handleActionDone = () => {
+    revalidate();
+    if (onActionDone) onActionDone();
   };
 
   return (
@@ -142,7 +166,7 @@ function TaskRow({ task, onDelete }) {
         )}
       </div>
       <div className="p-3 rounded-lg border bg-white">
-        <ActionCell task={task} summary={summary} onActionDone={revalidate} />
+        <ActionCell task={task} summary={summary} onActionDone={handleActionDone} />
       </div>
     </div>
   );
@@ -315,7 +339,153 @@ function CheckCell({ task, summary, onActionDone }) {
   );
 }
 
+function DailyView() {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const dateStr = formatDate(selectedDate);
+  
+  const { data: dailyTasks, error: tasksError, mutate: mutateTasks } = useSWR(`daily-tasks-${dateStr}`, () => getDailyTasks(dateStr));
+  const { data: dailyReport, mutate: mutateReport } = useSWR(`daily-report-${dateStr}`, () => getDailyReport(dateStr));
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState(null);
+
+  const handleGenerateTasks = async () => {
+    setGenerating(true);
+    setGenerateError(null);
+    try {
+      await generateDailyTasks(dateStr);
+      mutateTasks();
+      mutateReport();
+    } catch (err) {
+      setGenerateError(err.message);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const onDelete = async (id) => {
+    try {
+      await deleteTask(id);
+      mutateTasks();
+      mutateReport();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const onActionDone = () => {
+    mutateTasks();
+    mutateReport();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <input
+            type="date"
+            value={dateStr}
+            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+            className="input"
+          />
+          <button
+            onClick={handleGenerateTasks}
+            disabled={generating}
+            className="btn"
+          >
+            {generating ? 'Generating...' : 'Generate Tasks'}
+          </button>
+        </div>
+      </div>
+      
+      {generateError && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          {generateError}
+        </div>
+      )}
+      
+      {dailyReport && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="p-4 bg-white rounded-lg border">
+            <div className="text-2xl font-bold text-blue-600">{dailyReport.total_tasks}</div>
+            <div className="text-sm text-gray-500">Total Tasks</div>
+          </div>
+          <div className="p-4 bg-white rounded-lg border">
+            <div className="text-2xl font-bold text-green-600">{dailyReport.completed_tasks}</div>
+            <div className="text-sm text-gray-500">Completed</div>
+          </div>
+          <div className="p-4 bg-white rounded-lg border">
+            <div className="text-2xl font-bold text-purple-600">{dailyReport.completion_rate}%</div>
+            <div className="text-sm text-gray-500">Completion Rate</div>
+          </div>
+          <div className="p-4 bg-white rounded-lg border">
+            <div className="text-sm text-gray-500 mb-1">By Type</div>
+            <div className="text-xs space-y-1">
+              <div>Count: {dailyReport.metrics.count}</div>
+              <div>Timer: {dailyReport.metrics.timer}</div>
+              <div>Check: {dailyReport.metrics.check}</div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {tasksError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          Failed to load daily tasks: {tasksError.message}
+        </div>
+      )}
+      
+      <div className="space-y-3">
+        {dailyTasks?.map((task) => (
+          <TaskRow key={task.id} task={task} onDelete={onDelete} onActionDone={onActionDone} />
+        ))}
+        {dailyTasks?.length === 0 && (
+          <div className="p-6 text-center text-gray-500 border rounded-lg bg-white">
+            No tasks for {dateStr}. Generate tasks from templates above.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TemplateView() {
+  const { data: templates, error: templatesError, mutate: mutateTemplates } = useSWR('templates', () => fetch(api('/templates')).then(r => r.json()));
+  
+  const onDeleteTemplate = async (id) => {
+    try {
+      await deleteTemplate(id);
+      mutateTemplates();
+    } catch (error) {
+      console.error('Failed to delete template:', error);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <TemplateForm onCreated={() => mutateTemplates()} />
+      
+      {templatesError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          Failed to load templates: {templatesError.message}
+        </div>
+      )}
+      
+      <div className="space-y-3">
+        {templates?.map((template) => (
+          <TemplateRow key={template.id} template={template} onDelete={onDeleteTemplate} />
+        ))}
+        {templates?.length === 0 && (
+          <div className="p-6 text-center text-gray-500 border rounded-lg bg-white">
+            No templates yet. Create one above.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [activeTab, setActiveTab] = useState('daily');
   const { tasks, error: tasksError, isLoading } = useTasks();
 
   const onDelete = async (id) => {
@@ -323,32 +493,180 @@ export default function App() {
       await deleteTask(id);
       mutate(api("/tasks"));
     } catch (error) {
-      throw error; // Re-throw to be handled by TaskRow
+      throw error;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <TopBar />
+      <TopBar activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="max-w-4xl mx-auto p-4 space-y-4">
-        {tasksError && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            Failed to load tasks: {tasksError.message}
-          </div>
-        )}
-        <TaskForm />
-        {isLoading && <div className="text-sm text-gray-500">Loading tasks…</div>}
-        <div className="space-y-3">
-          {tasks.map((t) => (
-            <TaskRow key={t.id} task={t} onDelete={onDelete} />
-          ))}
-          {!tasks.length && !isLoading && (
-            <div className="p-6 text-center text-gray-500 border rounded-lg bg-white">
-              No tasks yet. Create one above.
+        {activeTab === 'tasks' && (
+          <>
+            {tasksError && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                Failed to load tasks: {tasksError.message}
+              </div>
+            )}
+            <TaskForm />
+            {isLoading && <div className="text-sm text-gray-500">Loading tasks…</div>}
+            <div className="space-y-3">
+              {tasks.map((t) => (
+                <TaskRow key={t.id} task={t} onDelete={onDelete} />
+              ))}
+              {!tasks.length && !isLoading && (
+                <div className="p-6 text-center text-gray-500 border rounded-lg bg-white">
+                  No tasks yet. Create one above.
+                </div>
+              )}
             </div>
-          )}
+          </>
+        )}
+        
+        {activeTab === 'daily' && <DailyView />}
+        {activeTab === 'templates' && <TemplateView />}
+      </div>
+    </div>
+  );
+}
+
+function TemplateForm({ onCreated }) {
+  const [name, setName] = useState("");
+  const [metric, setMetric] = useState("count");
+  const [goal, setGoal] = useState("");
+  const [color, setColor] = useState("#6366F1");
+  const [activeDays, setActiveDays] = useState([1, 2, 3, 4, 5]); // Weekdays by default
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (!name.trim() || activeDays.length === 0) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await createTemplate({ 
+        name: name.trim(), 
+        metric, 
+        goal: goal ? Number(goal) : null, 
+        color,
+        active_days: activeDays
+      });
+      setName("");
+      setGoal("");
+      setMetric("count");
+      setActiveDays([1, 2, 3, 4, 5]);
+      if (onCreated) onCreated();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const toggleDay = (day) => {
+    setActiveDays(prev => 
+      prev.includes(day) 
+        ? prev.filter(d => d !== day)
+        : [...prev, day].sort()
+    );
+  };
+
+  return (
+    <div className="space-y-3">
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          Error: {error}
+        </div>
+      )}
+      <form onSubmit={onSubmit} className="p-4 bg-white rounded-lg shadow border space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <input
+            className="input"
+            placeholder="Template name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <select className="input" value={metric} onChange={(e) => setMetric(e.target.value)}>
+            {METRICS.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+          <input
+            type="number"
+            className="input"
+            placeholder={metric === "timer" ? "Goal (minutes)" : "Goal (count)"}
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+            min="0"
+          />
+          <input type="color" className="input h-10" value={color} onChange={(e) => setColor(e.target.value)} />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Active Days</label>
+          <div className="flex gap-2">
+            {dayNames.map((day, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => toggleDay(index)}
+                className={clsx(
+                  "px-3 py-1 text-sm rounded",
+                  activeDays.includes(index)
+                    ? "bg-blue-100 text-blue-700 border border-blue-300"
+                    : "bg-gray-100 text-gray-600 border border-gray-300"
+                )}
+              >
+                {day}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <button className="btn-primary" disabled={submitting || !name.trim() || activeDays.length === 0}>
+          {submitting ? "Creating..." : "Create Template"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function TemplateRow({ template, onDelete }) {
+  const [deleteError, setDeleteError] = useState(null);
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  
+  const handleDelete = async () => {
+    setDeleteError(null);
+    try {
+      await onDelete(template.id);
+    } catch (err) {
+      setDeleteError(err.message);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-3 p-4 rounded-lg border bg-white">
+      <div className="w-3 h-10 rounded" style={{ backgroundColor: template.color }} />
+      <div className="flex-1">
+        <div className="font-medium">{template.name}</div>
+        <div className="text-xs text-gray-500">
+          {template.metric}{template.goal ? ` • goal: ${template.goal}` : ""}
+        </div>
+        <div className="text-xs text-gray-500 mt-1">
+          Days: {template.active_days.map(day => dayNames[day]).join(', ')}
         </div>
       </div>
+      <button className="btn danger" onClick={handleDelete} title="Delete template">
+        ✕
+      </button>
+      {deleteError && (
+        <div className="text-xs text-red-600 mt-1">{deleteError}</div>
+      )}
     </div>
   );
 }
