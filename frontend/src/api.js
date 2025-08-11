@@ -4,15 +4,26 @@ export const api = (path) => `${BASE}${path}`;
 
 // CSRF token management
 let csrfToken = null;
+let tokenInitialized = false;
 
 export async function getCsrfToken() {
-  if (!csrfToken) {
+  if (!csrfToken && !tokenInitialized) {
+    tokenInitialized = true;
     try {
-      const response = await fetch(api("/csrf-token"), { credentials: 'include' });
+      // Use same-site and secure fetch for CSRF token initialization
+      const response = await fetch(api("/csrf-token"), { 
+        credentials: 'same-origin',
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       csrfToken = data.csrf_token;
     } catch (error) {
+      tokenInitialized = false; // Reset on error to allow retry
       console.error('Failed to get CSRF token:', error);
       throw new Error('Failed to initialize security token');
     }
@@ -32,10 +43,20 @@ async function apiCall(url, options = {}) {
   const response = await fetch(url, {
     ...options,
     headers,
-    credentials: 'include'
+    credentials: 'same-origin'
   });
   
   if (!response.ok) {
+    // Handle CSRF token expiration
+    if (response.status === 403) {
+      csrfToken = null;
+      tokenInitialized = false;
+      // Retry once with new token
+      if (!options._retry) {
+        return apiCall(url, { ...options, _retry: true });
+      }
+    }
+    
     const errorText = await response.text();
     let errorMessage;
     try {
