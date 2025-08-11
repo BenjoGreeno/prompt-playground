@@ -74,7 +74,7 @@ class MetricType(str):
 
 class TaskCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    color: str = Field("#6366F1", description="Tile color hex", regex=r'^#[0-9A-Fa-f]{6}$')
+    color: str = Field("#6366F1", description="Tile color hex", pattern=r'^#[0-9A-Fa-f]{6}$')
     metric: str = Field(MetricType.COUNT, description="count|timer|check")
     goal: Optional[int] = Field(None, description="Goal units (sets/minutes/checks)", ge=1, le=10000)
     
@@ -173,7 +173,7 @@ def delete_task(request: Request, task_id: str, db=Depends(get_database), csrf_p
         raise HTTPException(status_code=500, detail="Failed to delete task")
 
 class EventCreate(BaseModel):
-    type: str = Field(..., regex=r'^(increment|timer_start|timer_stop|check)$')
+    type: str = Field(..., pattern=r'^(increment|timer_start|timer_stop|check)$')
     value: Optional[int] = Field(None, ge=0, le=86400)  # Max 24 hours in seconds
     
     @validator('value', always=True)
