@@ -165,7 +165,6 @@ def get_csrf_token(request: Request, csrf_protect: CsrfProtect = Depends()):
 # Template endpoints
 @app.get("/api/templates", response_model=List[TaskTemplate])
 def list_templates(db=Depends(get_database)):
-    ensure_indexes(db)
     items = []
     try:
         for doc in db["templates"].find({}, {"_id": 0}).limit(100):
@@ -177,7 +176,6 @@ def list_templates(db=Depends(get_database)):
 @app.post("/api/templates", response_model=TaskTemplate)
 def create_template(request: Request, payload: TaskTemplateCreate, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
     csrf_protect.validate_csrf(request)
-    ensure_indexes(db)
     tid = str(uuid.uuid4())
     doc = {
         "id": tid,
@@ -199,7 +197,6 @@ def create_template(request: Request, payload: TaskTemplateCreate, db=Depends(ge
 def delete_template(request: Request, template_id: str, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
     csrf_protect.validate_csrf(request)
     template_id = validate_task_id(template_id)
-    ensure_indexes(db)
     try:
         template = db["templates"].find_one({"id": template_id})
         if not template:
@@ -214,7 +211,6 @@ def delete_template(request: Request, template_id: str, db=Depends(get_database)
 
 @app.get("/api/tasks", response_model=List[Task])
 def list_tasks(date_filter: Optional[str] = None, db=Depends(get_database)):
-    ensure_indexes(db)
     items = []
     try:
         query = {}
@@ -235,7 +231,6 @@ def list_tasks(date_filter: Optional[str] = None, db=Depends(get_database)):
 
 @app.get("/api/tasks/daily/{date_str}", response_model=List[Task])
 def get_daily_tasks(date_str: str, db=Depends(get_database)):
-    ensure_indexes(db)
     try:
         filter_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     except ValueError:
@@ -253,7 +248,6 @@ def get_daily_tasks(date_str: str, db=Depends(get_database)):
 @app.post("/api/tasks", response_model=Task)
 def create_task(request: Request, payload: TaskCreate, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
     csrf_protect.validate_csrf(request)
-    ensure_indexes(db)
     tid = str(uuid.uuid4())
     doc = {
         "id": tid,
@@ -276,7 +270,6 @@ def create_task(request: Request, payload: TaskCreate, db=Depends(get_database),
 def delete_task(request: Request, task_id: str, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
     csrf_protect.validate_csrf(request)
     task_id = validate_task_id(task_id)
-    ensure_indexes(db)
     try:
         # Check if task exists first
         task = db["tasks"].find_one({"id": task_id})
@@ -309,7 +302,6 @@ class EventCreate(BaseModel):
 def create_event(request: Request, task_id: str, payload: EventCreate, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
     csrf_protect.validate_csrf(request)
     task_id = validate_task_id(task_id)
-    ensure_indexes(db)
     
     try:
         # Validate task exists
@@ -337,7 +329,6 @@ def create_event(request: Request, task_id: str, payload: EventCreate, db=Depend
 @app.get("/api/tasks/{task_id}/summary")
 def task_summary(task_id: str, db=Depends(get_database)):
     task_id = validate_task_id(task_id)
-    ensure_indexes(db)
     
     try:
         task = db["tasks"].find_one({"id": task_id}, {"_id": 0})
@@ -381,7 +372,6 @@ def task_summary(task_id: str, db=Depends(get_database)):
 def generate_daily_tasks(request: Request, date_str: str, db=Depends(get_database), csrf_protect: CsrfProtect = Depends()):
     """Generate daily tasks from templates for a specific date"""
     csrf_protect.validate_csrf(request)
-    ensure_indexes(db)
     
     try:
         target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -423,7 +413,6 @@ def generate_daily_tasks(request: Request, date_str: str, db=Depends(get_databas
 @app.get("/api/reports/daily/{date_str}")
 def daily_report(date_str: str, db=Depends(get_database)):
     """Get daily progress report"""
-    ensure_indexes(db)
     
     try:
         target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
