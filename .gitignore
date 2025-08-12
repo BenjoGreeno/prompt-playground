@@ -1,1 +1,37 @@
 .amazonq
+
+# Dependencies
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# React Native
+mobile/android/app/build/
+mobile/ios/build/
+mobile/.expo/
+mobile/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Build outputs
+build/
+dist/
+out/
+
+# Environment
+.env.local
+.env.*.local
