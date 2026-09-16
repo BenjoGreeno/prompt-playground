@@ -60,6 +60,18 @@ Simple English-style phonetics are given in `[brackets]` under the Tourist's lin
 | 5 | 🗺️ Directions — both asking **and** giving | [`05-directions.md`](05-directions.md) |
 | 6 | 🚕 Taxi — telling the driver, the ride, paying | [`06-taxi.md`](06-taxi.md) |
 
+## 🚀 Speed-run learning toolkit (read these too!)
+
+The scripts get you through fixed situations. These pages get you **holding real
+conversations** so you can keep learning from native speakers — which is the whole point.
+
+| # | Page | What it's for |
+|---|------|---------------|
+| 7 | 🎣 [Keep the Conversation Alive](07-keep-the-conversation-alive.md) | **Most important page.** Fillers, lifelines & the anti-English-switch phrase |
+| 8 | 🧱 [Lego Spanish — Sentence Builder](08-lego-spanish-sentence-builder.md) | ~12 frames → hundreds of sentences |
+| 9 | 🎭 [Weird Memory Tricks & 5-Day Plan](09-weird-memory-tricks-and-5-day-plan.md) | Absurd mnemonics + a day-by-day study plan |
+| 10 | 🗣️ [Free-Conversation Prompts](10-free-conversation-prompts.md) | Improv challenges for two (no scripts!) |
+
 ## Universal survival phrases (learn these first!)
 
 | English | Spanish | Say it like |
