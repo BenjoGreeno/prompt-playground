@@ -103,3 +103,36 @@ Roles: 🧳 **TURISTA** (you) · 🧑‍💼 **CAMARERO/A** (bartender)
 > **Culture note:** Tapas culture varies by region! In some places (e.g. Granada, León)
 > a free tapa comes with each drink. In others you order and pay for them. Just ask:
 > *"¿La tapa va incluida?"* — "Is the tapa included?"
+
+
+---
+
+## 🍊 Valencia special — Agua de Valencia
+
+**🧳 TURISTA:** Oye, ¿tenéis agua de Valencia?
+*Hey, do you (all) have Agua de Valencia?*
+`[OH-yeh, teh-NAYS AH-gwah deh bah-LEN-thee-ah]`
+
+**🧑‍💼 CAMARERO/A:** ¡Cómo no! ¿Una jarra para compartir?
+*Of course! A jug to share?*
+
+**🧳 TURISTA:** Sí, una jarra para dos. ¿Es muy fuerte?
+*Yes, a jug for two. Is it very strong?*
+`[see, OO-nah HAH-rrah PAH-rah dos. es mooy FWER-teh]`
+
+**🧑‍💼 CAMARERO/A:** Un poquito, sí. Lleva cava, naranja y ginebra. ¡Con cuidado!
+*A little, yes. It has cava, orange and gin. Careful!*
+
+**🧳 TURISTA:** ¡Vale, vale! Poco a poco. ¡Salud!
+*OK, OK! Slowly does it. Cheers!*
+`[BAH-leh, BAH-leh! POH-koh ah POH-koh. sah-LOOD]`
+
+**Valencia bar vocab**
+- agua de Valencia — cava + orange juice + gin/vodka cocktail `[AH-gwah deh bah-LEN-thee-ah]`
+- una jarra — a jug (to share) `[OO-nah HAH-rrah]`
+- cava — Spanish sparkling wine `[KAH-bah]`
+- esgarraet — roast pepper & salt-cod tapa `[es-gah-RRAH-et]`
+- clòtxina — small local Valencian mussel (in season) `[KLOT-chee-nah]`
+
+> **Culture note:** *Agua de Valencia* is deceptively easy to drink and quite strong.
+> Order *una jarra* to share and go *poco a poco* (slowly)! 🍹

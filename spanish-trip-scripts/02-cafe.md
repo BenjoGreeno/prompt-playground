@@ -86,3 +86,32 @@ Roles: 🧳 **TURISTA** (you) · 🧑‍💼 **CAMARERO/A** (café server)
 
 > **Culture note:** Tipping is modest in Spain — rounding up or leaving small change
 > is normal and appreciated, not expected. No need for 15–20%.
+
+
+---
+
+## 🍊 Valencia special — Horchata & fartons
+
+**🧳 TURISTA:** Hola, buenos días. ¿Tienen horchata?
+*Hi, good morning. Do you have horchata?*
+`[OH-lah, BWEH-nos DEE-as. tee-EH-nen or-CHAH-tah]`
+
+**🧑‍💼 CAMARERO/A:** Sí, claro. ¿La quiere natural o granizada?
+*Yes, of course. Do you want it regular or slushie-style?*
+
+**🧳 TURISTA:** Una natural, bien fría. Y unos fartons para mojar.
+*A regular one, nice and cold. And some fartons for dipping.*
+`[OO-nah nah-too-RAL, bee-EN FREE-ah. ee OO-nos far-TONS PAH-rah moh-HAR]`
+
+**🧑‍💼 CAMARERO/A:** Marchando. Es muy típico de aquí.
+*Coming up. It's very typical of here.*
+
+**🧳 TURISTA:** ¡Me encanta! Está buenísima.
+*I love it! It's delicious.*
+`[meh en-KAN-tah! es-TAH bweh-NEE-see-mah]`
+
+**Valencia café vocab**
+- una horchata (orxata) — tiger-nut milk drink `[or-CHAH-tah]`
+- granizada — semi-frozen / slushie style `[grah-nee-THAH-dah]`
+- fartons — long sweet pastries for dipping `[far-TONS]`
+- una coca — a local flatbread (sweet or savoury) `[OO-nah KOH-kah]`

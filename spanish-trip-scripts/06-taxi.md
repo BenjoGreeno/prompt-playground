@@ -104,3 +104,15 @@ Roles: 🧳 **TURISTA** (you) · 🧑‍💼 **TAXISTA** (taxi driver)
 
 > **Tip:** For airport trips, many Spanish cities have a **fixed fare** (*tarifa fija*).
 > Ask up front: *"¿Hay tarifa fija al aeropuerto?"* to avoid surprises.
+
+---
+
+## 🍊 Valencia note
+
+Valencia's **airport (Manises)** is only about 8 km from the centre — a taxi to the old
+town is usually a short, reasonable ride. There's also a **metro** (lines 3 & 5) straight
+from the airport into town if you'd rather. Useful line:
+
+- Al centro desde el aeropuerto, ¿cuánto es más o menos?
+  *To the centre from the airport, how much is it roughly?*
+  `[al THEN-troh DES-deh el ah-eh-roh-PWER-toh, KWAN-toh es mas oh MEH-nos]`

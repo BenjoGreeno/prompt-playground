@@ -1,12 +1,30 @@
-# 🇪🇸 Spanish Trip Survival Scripts
+# 🇪🇸 Spanish Trip Survival Scripts — Valencia 🍊
 
-Practice scripts for a week-long trip to Spain, built for **two people to practise together**.
+Practice scripts for a week-long trip to **Valencia**, built for **two people to practise together**.
 Aimed at an **A1 / A2** learner who already knows a fair bit of vocabulary.
 
 > **Spanish variety:** These use **Castilian Spanish (Spain)** — including *vosotros*
 > and the *ceceo* "th" sound (e.g. *gracias* → "GRAH-thee-ahs", *cerveza* → "ther-BEH-tha").
-> If you're going to a specific city and want tweaks (e.g. Catalan phrases for Barcelona,
-> Andalusian habits for Sevilla), just ask.
+> Castilian Spanish is spoken and understood everywhere in Valencia.
+
+## 🍊 Valencia notes (read this!)
+
+- **Language:** Valencia is bilingual — **Valencian (*valencià*)** is co-official with Spanish.
+  You'll see it on street signs, menus and buildings (e.g. *Ajuntament* = town hall,
+  *carrer* = street, *plaça* = square). **Everyone understands Spanish**, so you don't
+  need Valencian — but a couple of courtesy words earn big smiles:
+  - *Bon dia* — Good morning (Val.) `[bon DEE-ah]`
+  - *Gràcies* — Thanks (Val.) `[GRAH-see-es]`
+  - *Adéu* — Bye (Val.) `[ah-DEH-oo]`
+- **Paella is FROM Valencia** — and locals are proud of it. Authentic *paella valenciana*
+  has chicken, rabbit and beans (**not** seafood — that's *paella de marisco* or *mixta*).
+  It's traditionally a **lunch** dish, not dinner. Ordering it well = instant respect. 😄
+- **Horchata (*orxata*) + fartons** — chilled tiger-nut milk with sweet pastries for dipping.
+  A classic Valencian café treat, especially in summer.
+- **Agua de Valencia** — the city's famous cocktail (cava + orange juice + gin/vodka).
+  Fun for the bar script — but strong, so pace yourselves!
+- **Local dishes to try:** *fideuà* (paella made with noodles), *esgarraet* (roast pepper
+  & cod salad), *all i pebre* (eel & potato stew), *coca* (savoury/sweet flatbread).
 
 ## How to practise (two people)
 

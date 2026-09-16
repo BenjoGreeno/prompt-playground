@@ -99,3 +99,31 @@ Here the 🧳 person plays a **confused visitor** and the 🧑‍💼 person (yo
 
 > **Tip:** If you don't catch the reply, just point and ask *"¿Por aquí?"* (this way?)
 > while gesturing — locals will nod or wave you the right direction. 🙂
+
+
+---
+
+## 🍊 Valencia special — Real places to ask for
+
+Swap these real Valencia landmarks into the scripts above so your practice matches
+where you'll actually be:
+
+- la Ciudad de las Artes y las Ciencias — City of Arts & Sciences `[thee-oo-DAD deh las AR-tes ee las thee-EN-thee-as]`
+- la Plaza del Ayuntamiento — the Town Hall square `[PLAH-thah del ah-yoon-tah-mee-EN-toh]`
+- el Mercado Central — the Central Market (stunning, great food) `[mer-KAH-doh then-TRAL]`
+- la Catedral / el Miguelete — the Cathedral / its bell tower `[el mee-geh-LEH-teh]`
+- la Lonja de la Seda — the Silk Exchange (UNESCO site) `[LON-hah deh lah SEH-dah]`
+- el barrio del Carmen — the old town / Carmen quarter `[BAH-rree-oh del KAR-men]`
+- la playa de la Malvarrosa — Malvarrosa beach `[PLAH-yah deh lah mal-bah-RROH-sah]`
+- los Jardines del Turia — the Turia gardens (old riverbed park) `[har-DEE-nes del TOO-ree-ah]`
+- la Estación del Norte — the North (main train) station `[es-tah-thee-ON del NOR-teh]`
+
+**Getting around Valencia**
+- ¿Dónde está la parada del metro más cercana? — Where's the nearest metro stop?
+- ¿Qué línea va a la playa? — Which line goes to the beach?
+- ¿Hay Valenbisi por aquí? — Is there a Valenbisi (city bike) nearby? `[bah-len-BEE-see]`
+- ¿Se puede ir andando o mejor en metro? — Can I walk or is the metro better?
+
+> **Bilingual signs tip:** Street signs often use Valencian: *carrer* = calle (street),
+> *plaça* = plaza (square), *avinguda* = avenida (avenue). Don't panic — they're the
+> same places, just in *valencià*. 🙂

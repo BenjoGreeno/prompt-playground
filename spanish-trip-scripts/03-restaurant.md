@@ -100,3 +100,43 @@ Roles: 🧳 **TURISTA** (you) · 🧑‍💼 **CAMARERO/A** (waiter)
 - ¿Qué nos recomienda? — What do you recommend?
 - ¿Me puede traer otro tenedor? — Can you bring me another fork?
 - Estaba delicioso — It was delicious
+
+
+---
+
+## 🍊 Valencia special — Ordering paella like a local
+
+> Paella is a **Valencian** dish and locals care about it! It's traditionally eaten at
+> **lunch**, often shared, and *paella valenciana* means chicken/rabbit/beans — **not** seafood.
+
+**🧳 TURISTA:** Hola. ¿La paella es para compartir? ¿Para cuántas personas?
+*Hi. Is the paella for sharing? For how many people?*
+`[OH-lah. lah pah-EH-yah es PAH-rah kom-par-TEER? PAH-rah KWAN-tas per-SOH-nas]`
+
+**🧑‍💼 CAMARERO/A:** Sí, es para compartir. Mínimo dos personas.
+*Yes, it's for sharing. Minimum two people.*
+
+**🧳 TURISTA:** Perfecto. Una paella valenciana para dos, por favor.
+*Perfect. A Valencian paella for two, please.*
+`[per-FEK-toh. OO-nah pah-EH-yah bah-len-thee-AH-nah PAH-rah dos por fah-BOR]`
+
+**🧑‍💼 CAMARERO/A:** Muy bien. Tarda unos veinte minutos, se hace al momento.
+*Very good. It takes about twenty minutes, it's made fresh.*
+
+**🧳 TURISTA:** Sin problema. ¿Y de postre, tienen algo típico?
+*No problem. And for dessert, do you have anything typical?*
+`[seen proh-BLEH-mah. ee deh POS-treh, tee-EH-nen AL-goh TEE-pee-koh]`
+
+**🧑‍💼 CAMARERO/A:** Tenemos naranjas de Valencia y turrón.
+*We have Valencian oranges and turrón (nougat).*
+
+**Valencian dishes vocab**
+- paella valenciana — chicken, rabbit & beans (the original) `[pah-EH-yah bah-len-thee-AH-nah]`
+- paella de marisco — seafood paella `[…deh mah-REES-koh]`
+- arroz a banda — rice cooked in fish stock `[ah-RROTH ah BAN-dah]`
+- fideuà — like paella but with noodles `[fee-deh-WAH]`
+- all i pebre — eel & potato stew `[AL ee PEH-breh]`
+- el socarrat — the prized crispy rice at the bottom of the pan `[soh-kah-RRAT]`
+
+> **Local tip:** Ask for *"el socarrat"* — the crispy caramelised rice at the bottom of
+> the pan. Knowing that word marks you out as someone who *gets* paella. 😎
