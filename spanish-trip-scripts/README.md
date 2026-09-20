@@ -71,6 +71,11 @@ conversations** so you can keep learning from native speakers — which is the w
 | 8 | 🧱 [Lego Spanish — Sentence Builder](08-lego-spanish-sentence-builder.md) | ~12 frames → hundreds of sentences |
 | 9 | 🎭 [Weird Memory Tricks & 5-Day Plan](09-weird-memory-tricks-and-5-day-plan.md) | Absurd mnemonics + a day-by-day study plan |
 | 10 | 🗣️ [Free-Conversation Prompts](10-free-conversation-prompts.md) | Improv challenges for two (no scripts!) |
+| 11 | 👂 [Listen Out For This](11-listen-out-for-this.md) | What locals will say to **you** + go-to replies |
+| 12 | 🚌 [Bus](12-bus.md) | Catching a city bus — finding, paying, getting off |
+| 13 | 🌍 [About Us — Where We're From](13-about-us-where-were-from.md) | Personalised "where are you from?" answers |
+| 14 | 😄 [Humour & Charm](14-humour-and-charm.md) | Self-deprecating lines to disarm & win people over |
+| 15 | 🎸 [Nightlife, Dives & Chatting to Locals](15-nightlife-dives-and-handling-lairy-people.md) | Dive-bar/gig know-how, talking to the pair of you, + safety |
 
 ## Universal survival phrases (learn these first!)
 
