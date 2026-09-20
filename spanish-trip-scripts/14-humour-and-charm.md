@@ -26,6 +26,20 @@ your Spanish. It's the perfect ice-breaker. 🎯
 - Mi español es un desastre, pero mi apetito no. — My Spanish is a disaster, but my appetite isn't. 🍤
 - Hablo español… más o menos… menos que más. — I speak Spanish… more or less… less than more. 😅
 
+### 🎤 The killer combo (your best joke!)
+
+Deliver these two lines back-to-back — the contrast is what makes people laugh:
+
+**Yo soy un desastre con los idiomas… pero mi novia habla tres.**
+*I'm a disaster with languages… but my girlfriend speaks three.* 😄
+`[yoh soy oon deh-SAS-treh kon los ee-dee-OH-mas… PEH-roh mee NOH-bee-ah AH-blah tres]`
+
+- **mi novia** — my girlfriend · **mi pareja** — my partner (gender-neutral) `[pah-REH-hah]`
+- **habla tres (idiomas)** — speaks three (languages)
+
+Point at her when you say it — the timing sells the joke. She becomes the star; you get
+the laugh. Everyone wins. 🌟
+
 ---
 
 ## 🙃 Self-deprecating openers (get them on your side)

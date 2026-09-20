@@ -22,6 +22,28 @@ short version first; pull out the longer bits when you want to keep chatting.
 
 That's it — that covers 90% of what they want to know. 🎉
 
+### 🌟 The brag-about-her line (great with your humour combo)
+
+**Mi novia habla tres idiomas.** — My girlfriend speaks three languages.
+`[mee NOH-bee-ah AH-blah tres ee-dee-OH-mas]`
+
+Pairs perfectly with your self-deprecating joke (see page 14):
+> *Yo soy un desastre con los idiomas… pero mi novia habla tres.*
+> — I'm a disaster with languages… but my girlfriend speaks three. 😄
+
+**Which three?** Have this ready — they'll ask:
+- **Habla griego, alemán e inglés.** — She speaks Greek, German and English.
+  `[AH-blah gree-EH-goh, ah-leh-MAN eh een-GLES]`
+  > Note: it's ***e*** inglés, not *y* inglés — Spanish swaps *y* → *e* before an "i" sound.
+
+**Follow-ups you'll hear about her languages:**
+- 🔊 **¿Y tú cuántos hablas?** — And how many do you speak?
+  → *Yo… uno y medio.* — Me… one and a half. 😅 *(instant laugh)*
+- 🔊 **¿Habla español también?** — Does she speak Spanish too?
+  → *Un poco, mejor que yo.* — A little, better than me.
+- 🔊 **¡Qué envidia! / ¡Qué suerte!** — How I envy that! / How lucky!
+  → *Sí, ¡la lista es ella!* — Yes, she's the clever one!
+
 ---
 
 ## 🗣️ If she's answering for herself
