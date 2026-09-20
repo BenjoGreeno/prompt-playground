@@ -74,6 +74,7 @@ conversations** so you can keep learning from native speakers — which is the w
 | 11 | 👂 [Listen Out For This](11-listen-out-for-this.md) | What locals will say to **you** + go-to replies |
 | 12 | 🚌 [Bus](12-bus.md) | Catching a city bus — finding, paying, getting off |
 | 13 | 🌍 [About Us — Where We're From](13-about-us-where-were-from.md) | Personalised "where are you from?" answers |
+| 14 | 😄 [Humour & Charm](14-humour-and-charm.md) | Self-deprecating lines to disarm & win people over |
 
 ## Universal survival phrases (learn these first!)
 
