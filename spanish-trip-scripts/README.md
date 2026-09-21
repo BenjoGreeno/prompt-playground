@@ -76,6 +76,7 @@ conversations** so you can keep learning from native speakers — which is the w
 | 13 | 🌍 [About Us — Where We're From](13-about-us-where-were-from.md) | Personalised "where are you from?" answers |
 | 14 | 😄 [Humour & Charm](14-humour-and-charm.md) | Self-deprecating lines to disarm & win people over |
 | 15 | 🎸 [Nightlife, Dives & Chatting to Locals](15-nightlife-dives-and-handling-lairy-people.md) | Dive-bar/gig know-how, talking to the pair of you, + safety |
+| 16 | 🗣️ [What They'll Fire Back](16-what-theyll-fire-back.md) | Realistic replies you'll HEAR in every scenario + key words to catch |
 
 ## Universal survival phrases (learn these first!)
 
