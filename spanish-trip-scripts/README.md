@@ -75,7 +75,9 @@ conversations** so you can keep learning from native speakers — which is the w
 | 12 | 🚌 [Bus](12-bus.md) | Catching a city bus — finding, paying, getting off |
 | 13 | 🌍 [About Us — Where We're From](13-about-us-where-were-from.md) | Personalised "where are you from?" answers |
 | 14 | 😄 [Humour & Charm](14-humour-and-charm.md) | Self-deprecating lines to disarm & win people over |
-| 15 | 🎸 [Nightlife, Dives & Chatting to Locals](15-nightlife-dives-and-handling-lairy-people.md) | Dive-bar/gig know-how, talking to the pair of you, + safety |
+| 15 | 🎸 [Nightlife, Dives & Chatting to Locals](15-nightlife-dives-and-chatting-to-locals.md) | Dive-bar/gig know-how, talking to the pair of you, + safety |
+| 16 | 🗣️ [What They'll Fire Back](16-what-theyll-fire-back.md) | Realistic replies you'll HEAR in every scenario |
+| 17 | 🎯 [Tenses & Talking About Yourself](17-tenses-and-talking-about-yourself.md) | I want/think/went + personal sentences (work, music, band) |
 
 ## Universal survival phrases (learn these first!)
 
