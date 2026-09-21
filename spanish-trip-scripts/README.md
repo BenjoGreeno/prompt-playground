@@ -79,6 +79,7 @@ conversations** so you can keep learning from native speakers — which is the w
 | 16 | 🗣️ [What They'll Fire Back](16-what-theyll-fire-back.md) | Realistic replies you'll HEAR in every scenario |
 | 17 | 🎯 [Tenses & Talking About Yourself](17-tenses-and-talking-about-yourself.md) | I want/think/went + personal sentences (work, music, band) |
 | 18 | 🌙 [Arriving Late at the Hotel](18-arriving-late-at-the-hotel.md) | Late check-in + "is there food at this hour?" |
+| 19 | 💶 [Numbers & Prices](19-numbers-and-prices.md) | Understanding the bill — euros, cents, and drilling prices |
 
 ## Universal survival phrases (learn these first!)
 
